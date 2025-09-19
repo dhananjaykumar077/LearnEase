@@ -3,140 +3,242 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LearnEase - Smart Study Planner</title>
+  <title>Study Planner</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f8fb; margin: 0; padding: 0; }
-    header { background: linear-gradient(90deg, #004aad, #0077cc); color: white; text-align: center; padding: 20px; }
-    nav { background-color: #003580; padding: 10px; display: flex; justify-content: center; gap: 20px; }
-    nav a { color: white; text-decoration: none; font-weight: bold; }
-    nav a:hover { text-decoration: underline; }
-    .container { width: 80%; margin: 20px auto; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    h2 { color: #004aad; }
-    footer { background-color: #003580; color: white; text-align: center; padding: 10px; margin-top: 20px; }
-    .highlight { color: #0077cc; font-weight: bold; }
-    button { padding: 10px 15px; margin-top: 10px; background: #004aad; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #0077cc; }
-    input { padding: 8px; margin: 5px; }
-    progress { width: 100%; height: 20px; }
-    li.done { text-decoration: line-through; color: gray; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #000;
+      transition: background 0.3s, color 0.3s;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      position: relative;
+    }
+    nav {
+      background: #333;
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+    section {
+      padding: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: white;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    li.done {
+      text-decoration: line-through;
+      color: gray;
+    }
+    button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-fill {
+      background: #4CAF50;
+      height: 20px;
+      width: 0%;
+      text-align: center;
+      color: white;
+      line-height: 20px;
+    }
+    footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 20px;
+    }
+
+    /* 🌙 Dark Mode Styles */
+    body.dark {
+      background: #181818;
+      color: #f1f1f1;
+    }
+    body.dark li {
+      background: #222;
+      color: #ddd;
+    }
+    body.dark nav {
+      background: #111;
+    }
+    body.dark footer {
+      background: #111;
+    }
+    #darkToggle {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+      background: #fff;
+      color: #333;
+      border-radius: 5px;
+      border: none;
+    }
+    body.dark #darkToggle {
+      background: #333;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
-  <!-- Header -->
+
   <header>
-    <h1>📚 LearnEase</h1>
-    <p>Your Smart Personalized Study Planner</p>
+    <h1>📚 Study Planner</h1>
+    <button id="darkToggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
   </header>
 
-  <!-- Navigation -->
   <nav>
-    <a href="#">Home</a>
-    <a href="#">Dashboard</a>
-    <a href="#">Study Plan</a>
-    <a href="#">Progress</a>
-    <a href="#">Pomodoro Timer</a>
+    <a href="#plan">Study Plan</a>
+    <a href="#timer">Pomodoro</a>
+    <a href="#tracker">Progress</a>
   </nav>
 
-  <!-- Main Content -->
-  <div class="container">
-    <!-- Study Plan Section -->
-    <div class="card">
-      <h2>Add Your Study Plan</h2>
-      <input type="text" id="subject" placeholder="Enter Subject">
-      <input type="number" id="hours" placeholder="Hours">
-      <button onclick="addPlan()">Add</button>
-      <ul id="planList"></ul>
-    </div>
+  <!-- Study Plan Section -->
+  <section id="plan">
+    <h2>📖 Study Plan</h2>
+    <input type="text" id="subject" placeholder="Enter subject">
+    <input type="number" id="hours" placeholder="Hours">
+    <button onclick="addPlan()">➕ Add</button>
+    <ul id="planList"></ul>
+  </section>
 
-    <!-- Pomodoro Timer Section -->
-    <div class="card">
-      <h2>Pomodoro Timer ⏳</h2>
-      <p id="timer">25:00</p>
-      <button onclick="startTimer()">Start</button>
-      <button onclick="resetTimer()">Reset</button>
-    </div>
+  <!-- Pomodoro Timer -->
+  <section id="timer">
+    <h2>⏳ Pomodoro Timer</h2>
+    <p id="time">25:00</p>
+    <button onclick="startTimer()">▶️ Start</button>
+    <button onclick="pauseTimer()">⏸ Pause</button>
+    <button onclick="resetTimer()">🔄 Reset</button>
+  </section>
 
-    <!-- Progress Tracker Section -->
-    <div class="card">
-      <h2>Progress Tracker 📊</h2>
-      <p>Completion: <span id="progressPercent">0%</span></p>
-      <progress id="progressBar" value="0" max="100"></progress>
-      <p>🔥 Streak: <span id="streak">0</span> days in a row</p>
-      <button onclick="markDayComplete()">Mark Today Complete</button>
+  <!-- Progress Tracker -->
+  <section id="tracker">
+    <h2>📊 Progress Tracker</h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill">0%</div>
     </div>
-  </div>
+    <p id="progressText">Completed 0/0 tasks</p>
+    <p id="streakText">🔥 Streak: 0 days</p>
+    <button onclick="exportReport()">📤 Export Report</button>
+  </section>
 
-  <!-- Footer -->
   <footer>
-    <p>© 2025 LearnEase | Smarter Way to Study</p>
+    <p>© 2025 Study Planner</p>
   </footer>
 
-  <!-- JavaScript -->
   <script>
     let totalTasks = 0;
     let completedTasks = 0;
-    let streak = 0;
+    let streak = parseInt(localStorage.getItem("streak")) || 0;
+    let lastDate = localStorage.getItem("lastDate") || "";
 
-    // Load saved data from localStorage
-    window.onload = function() {
-      let savedPlans = JSON.parse(localStorage.getItem("plans")) || [];
-      streak = localStorage.getItem("streak") ? parseInt(localStorage.getItem("streak")) : 0;
-      completedTasks = localStorage.getItem("completedTasks") ? parseInt(localStorage.getItem("completedTasks")) : 0;
-      totalTasks = localStorage.getItem("totalTasks") ? parseInt(localStorage.getItem("totalTasks")) : 0;
-
-      savedPlans.forEach(plan => {
-        renderPlan(plan.subject, plan.hours, plan.done);
-      });
-
-      document.getElementById("streak").textContent = streak;
-      updateProgress();
+    // --- Handle Streak ---
+    function updateStreak() {
+      let today = new Date().toDateString();
+      if (lastDate !== today) {
+        if (lastDate === new Date(Date.now() - 86400000).toDateString()) {
+          streak++;
+        } else {
+          streak = 1;
+        }
+        lastDate = today;
+        localStorage.setItem("lastDate", today);
+        localStorage.setItem("streak", streak);
+      }
+      document.getElementById("streakText").textContent = `🔥 Streak: ${streak} days`;
     }
 
-    // Save data to localStorage
+    // --- Save & Load Data ---
     function saveData() {
-      let plans = [];
+      let data = {
+        tasks: [],
+        completed: completedTasks,
+        total: totalTasks,
+        streak: streak,
+        lastDate: lastDate
+      };
       document.querySelectorAll("#planList li").forEach(li => {
-        plans.push({
+        data.tasks.push({
           subject: li.dataset.subject,
           hours: li.dataset.hours,
           done: li.classList.contains("done")
         });
       });
-      localStorage.setItem("plans", JSON.stringify(plans));
-      localStorage.setItem("streak", streak);
-      localStorage.setItem("completedTasks", completedTasks);
-      localStorage.setItem("totalTasks", totalTasks);
+      localStorage.setItem("studyPlanner", JSON.stringify(data));
     }
 
-    // Add new study plan
+    function loadData() {
+      let saved = localStorage.getItem("studyPlanner");
+      if (saved) {
+        let data = JSON.parse(saved);
+        totalTasks = data.total;
+        completedTasks = data.completed;
+        streak = data.streak;
+        lastDate = data.lastDate || "";
+        document.getElementById("streakText").textContent = `🔥 Streak: ${streak} days`;
+        data.tasks.forEach(t => {
+          renderPlan(t.subject, t.hours, t.done);
+        });
+        updateProgress();
+      }
+      updateStreak();
+    }
+
+    // --- Add Plan ---
     function addPlan() {
       let subject = document.getElementById("subject").value;
       let hours = document.getElementById("hours").value;
-      if(subject && hours) {
-        renderPlan(subject, hours, false);
+      if (subject && hours) {
         totalTasks++;
+        renderPlan(subject, hours, false);
         updateProgress();
         saveData();
         document.getElementById("subject").value = "";
         document.getElementById("hours").value = "";
-      } else {
-        alert("Please enter both subject and hours!");
       }
     }
 
-    // Render plan in UI
+    // --- Render Plan with Edit & Delete ---
     function renderPlan(subject, hours, done) {
       let li = document.createElement("li");
       li.textContent = `📖 ${subject} - ${hours} hrs `;
       li.dataset.subject = subject;
       li.dataset.hours = hours;
 
-      let btn = document.createElement("button");
-      btn.textContent = "Complete ✅";
-      btn.style.marginLeft = "10px";
-      btn.onclick = function() {
-        if(!li.classList.contains("done")) {
+      // ✅ Complete Button
+      let completeBtn = document.createElement("button");
+      completeBtn.textContent = "Complete ✅";
+      completeBtn.onclick = function() {
+        if (!li.classList.contains("done")) {
           li.classList.add("done");
           completedTasks++;
           updateProgress();
@@ -144,50 +246,130 @@
         }
       };
 
-      if(done) {
+      // ✏️ Edit Button
+      let editBtn = document.createElement("button");
+      editBtn.textContent = "✏️ Edit";
+      editBtn.onclick = function() {
+        let newSubject = prompt("Enter new subject:", li.dataset.subject);
+        let newHours = prompt("Enter new hours:", li.dataset.hours);
+        if (newSubject && newHours) {
+          li.firstChild.textContent = `📖 ${newSubject} - ${newHours} hrs `;
+          li.dataset.subject = newSubject;
+          li.dataset.hours = newHours;
+          saveData();
+        }
+      };
+
+      // ❌ Delete Button
+      let deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "❌ Delete";
+      deleteBtn.onclick = function() {
+        if (li.classList.contains("done")) {
+          completedTasks--;
+        }
+        totalTasks--;
+        li.remove();
+        updateProgress();
+        saveData();
+      };
+
+      if (done) {
         li.classList.add("done");
       }
 
-      li.appendChild(btn);
+      li.appendChild(completeBtn);
+      li.appendChild(editBtn);
+      li.appendChild(deleteBtn);
+
       document.getElementById("planList").appendChild(li);
     }
 
-    // Update Progress Bar
+    // --- Progress Update ---
     function updateProgress() {
-      let percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
-      document.getElementById("progressPercent").textContent = percent + "%";
-      document.getElementById("progressBar").value = percent;
+      let percent = (completedTasks / totalTasks) * 100 || 0;
+      document.getElementById("progressFill").style.width = percent + "%";
+      document.getElementById("progressFill").textContent = Math.round(percent) + "%";
+      document.getElementById("progressText").textContent = `Completed ${completedTasks}/${totalTasks} tasks`;
     }
 
-    // Pomodoro Timer
-    let countdown;
+    // --- Export Report ---
+    function exportReport() {
+      let report = "📚 Study Report\n\n";
+      let tasks = document.querySelectorAll("#planList li");
+      tasks.forEach((task, index) => {
+        let subject = task.dataset.subject;
+        let hours = task.dataset.hours;
+        let status = task.classList.contains("done") ? "✅ Completed" : "❌ Pending";
+        report += `${index + 1}. ${subject} - ${hours} hrs - ${status}\n`;
+      });
+      report += `\nTotal Tasks: ${totalTasks}`;
+      report += `\nCompleted: ${completedTasks}`;
+      report += `\nProgress: ${((completedTasks / totalTasks) * 100 || 0).toFixed(2)}%`;
+      report += `\nCurrent Streak: ${streak} days\n`;
+
+      let blob = new Blob([report], { type: "text/plain" });
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Study_Report.txt";
+      link.click();
+    }
+
+    // --- Pomodoro Timer ---
+    let timeLeft = 25 * 60;
+    let timer;
+    function updateTimerDisplay() {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      document.getElementById("time").textContent =
+        `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    }
     function startTimer() {
-      let time = 25 * 60;
-      clearInterval(countdown);
-      countdown = setInterval(function() {
-        let minutes = Math.floor(time / 60);
-        let seconds = time % 60;
-        document.getElementById("timer").textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        time--;
-        if(time < 0) {
-          clearInterval(countdown);
-          alert("Time's up! Take a short break.");
-        }
-      }, 1000);
+      if (!timer) {
+        timer = setInterval(() => {
+          if (timeLeft > 0) {
+            timeLeft--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timer);
+            timer = null;
+            alert("⏰ Time's up! Take a break!");
+          }
+        }, 1000);
+      }
     }
-
+    function pauseTimer() {
+      clearInterval(timer);
+      timer = null;
+    }
     function resetTimer() {
-      clearInterval(countdown);
-      document.getElementById("timer").textContent = "25:00";
+      clearInterval(timer);
+      timer = null;
+      timeLeft = 25 * 60;
+      updateTimerDisplay();
     }
 
-    // Streak Tracker
-    function markDayComplete() {
-      streak++;
-      document.getElementById("streak").textContent = streak;
-      alert("Well done! You’ve completed today’s study ✅");
-      saveData();
+    // --- Dark Mode Toggle ---
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      let mode = document.body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("theme", mode);
+      document.getElementById("darkToggle").textContent =
+        mode === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+
+    // --- Initialize ---
+    updateTimerDisplay();
+    loadData();
+
+    // Apply saved theme
+    let savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+      document.getElementById("darkToggle").textContent = "☀️ Light Mode";
     }
   </script>
 </body>
 </html>
+
+
+
