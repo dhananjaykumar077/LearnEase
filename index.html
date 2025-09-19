@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnEase - Smart Study Planner</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f8fb; margin: 0; padding: 0; }
+    header { background: linear-gradient(90deg, #004aad, #0077cc); color: white; text-align: center; padding: 20px; }
+    nav { background-color: #003580; padding: 10px; display: flex; justify-content: center; gap: 20px; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .container { width: 80%; margin: 20px auto; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    h2 { color: #004aad; }
+    footer { background-color: #003580; color: white; text-align: center; padding: 10px; margin-top: 20px; }
+    .highlight { color: #0077cc; font-weight: bold; }
+    button { padding: 10px 15px; margin-top: 10px; background: #004aad; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0077cc; }
+    input { padding: 8px; margin: 5px; }
+    progress { width: 100%; height: 20px; }
+    li.done { text-decoration: line-through; color: gray; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>📚 LearnEase</h1>
+    <p>Your Smart Personalized Study Planner</p>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Dashboard</a>
+    <a href="#">Study Plan</a>
+    <a href="#">Progress</a>
+    <a href="#">Pomodoro Timer</a>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Study Plan Section -->
+    <div class="card">
+      <h2>Add Your Study Plan</h2>
+      <input type="text" id="subject" placeholder="Enter Subject">
+      <input type="number" id="hours" placeholder="Hours">
+      <button onclick="addPlan()">Add</button>
+      <ul id="planList"></ul>
+    </div>
+
+    <!-- Pomodoro Timer Section -->
+    <div class="card">
+      <h2>Pomodoro Timer ⏳</h2>
+      <p id="timer">25:00</p>
+      <button onclick="startTimer()">Start</button>
+      <button onclick="resetTimer()">Reset</button>
+    </div>
+
+    <!-- Progress Tracker Section -->
+    <div class="card">
+      <h2>Progress Tracker 📊</h2>
+      <p>Completion: <span id="progressPercent">0%</span></p>
+      <progress id="progressBar" value="0" max="100"></progress>
+      <p>🔥 Streak: <span id="streak">0</span> days in a row</p>
+      <button onclick="markDayComplete()">Mark Today Complete</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 LearnEase | Smarter Way to Study</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    let totalTasks = 0;
+    let completedTasks = 0;
+    let streak = 0;
+
+    // Load saved data from localStorage
+    window.onload = function() {
+      let savedPlans = JSON.parse(localStorage.getItem("plans")) || [];
+      streak = localStorage.getItem("streak") ? parseInt(localStorage.getItem("streak")) : 0;
+      completedTasks = localStorage.getItem("completedTasks") ? parseInt(localStorage.getItem("completedTasks")) : 0;
+      totalTasks = localStorage.getItem("totalTasks") ? parseInt(localStorage.getItem("totalTasks")) : 0;
+
+      savedPlans.forEach(plan => {
+        renderPlan(plan.subject, plan.hours, plan.done);
+      });
+
+      document.getElementById("streak").textContent = streak;
+      updateProgress();
+    }
+
+    // Save data to localStorage
+    function saveData() {
+      let plans = [];
+      document.querySelectorAll("#planList li").forEach(li => {
+        plans.push({
+          subject: li.dataset.subject,
+          hours: li.dataset.hours,
+          done: li.classList.contains("done")
+        });
+      });
+      localStorage.setItem("plans", JSON.stringify(plans));
+      localStorage.setItem("streak", streak);
+      localStorage.setItem("completedTasks", completedTasks);
+      localStorage.setItem("totalTasks", totalTasks);
+    }
+
+    // Add new study plan
+    function addPlan() {
+      let subject = document.getElementById("subject").value;
+      let hours = document.getElementById("hours").value;
+      if(subject && hours) {
+        renderPlan(subject, hours, false);
+        totalTasks++;
+        updateProgress();
+        saveData();
+        document.getElementById("subject").value = "";
+        document.getElementById("hours").value = "";
+      } else {
+        alert("Please enter both subject and hours!");
+      }
+    }
+
+    // Render plan in UI
+    function renderPlan(subject, hours, done) {
+      let li = document.createElement("li");
+      li.textContent = `📖 ${subject} - ${hours} hrs `;
+      li.dataset.subject = subject;
+      li.dataset.hours = hours;
+
+      let btn = document.createElement("button");
+      btn.textContent = "Complete ✅";
+      btn.style.marginLeft = "10px";
+      btn.onclick = function() {
+        if(!li.classList.contains("done")) {
+          li.classList.add("done");
+          completedTasks++;
+          updateProgress();
+          saveData();
+        }
+      };
+
+      if(done) {
+        li.classList.add("done");
+      }
+
+      li.appendChild(btn);
+      document.getElementById("planList").appendChild(li);
+    }
+
+    // Update Progress Bar
+    function updateProgress() {
+      let percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+      document.getElementById("progressPercent").textContent = percent + "%";
+      document.getElementById("progressBar").value = percent;
+    }
+
+    // Pomodoro Timer
+    let countdown;
+    function startTimer() {
+      let time = 25 * 60;
+      clearInterval(countdown);
+      countdown = setInterval(function() {
+        let minutes = Math.floor(time / 60);
+        let seconds = time % 60;
+        document.getElementById("timer").textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        time--;
+        if(time < 0) {
+          clearInterval(countdown);
+          alert("Time's up! Take a short break.");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(countdown);
+      document.getElementById("timer").textContent = "25:00";
+    }
+
+    // Streak Tracker
+    function markDayComplete() {
+      streak++;
+      document.getElementById("streak").textContent = streak;
+      alert("Well done! You’ve completed today’s study ✅");
+      saveData();
+    }
+  </script>
+</body>
+</html>
